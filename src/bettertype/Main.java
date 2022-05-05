@@ -20,6 +20,10 @@ public class Main {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
+		Database db = new Database();
+		db.conectar();
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -83,12 +87,13 @@ public class Main {
 		puntuacion_label.setBounds(42, 71, 569, 78);
 		frame.getContentPane().add(puntuacion_label);
 		
-		JLabel puntuacion_label_2 = new JLabel("Nadie - 0 puntos");
+		JLabel puntuacion_label_2 = new JLabel("");
 		puntuacion_label_2.setForeground(Color.WHITE);
 		puntuacion_label_2.setFont(new Font("Microsoft Uighur", Font.ITALIC, 57));
 		puntuacion_label_2.setBackground(Color.WHITE);
 		puntuacion_label_2.setBounds(42, 169, 569, 78);
 		frame.getContentPane().add(puntuacion_label_2);
+		puntuacion_label_2.setText("Puntuación :");
 		
 		JButton btnNewButton = new JButton("\u00A1Empieza a tipear!");
 		btnNewButton.setFont(new Font("Goudy Stout", Font.BOLD, 25));
