@@ -3,38 +3,65 @@ package bettertype;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Database {
 	
-    protected Connection conexion = null;
-    protected Statement stmt = null;
-
-	public Connection conectar() {
-		
-		final String URL = "jdbc:sqlite:./database/bettertype.db";
-		
+    protected Connection conexion;
+    protected Statement stmt;
+    protected String URL = "jdbc:sqlite:src/database/bettertype.db";
+    
+	public Database() {
+	
 		Connection conexion = null;
 		
 		try {
-			conexion = DriverManager.getConnection(URL);	
-			System.out.println("Conectado a la base de datos");
-			stmt = conexion.createStatement();
-			String sql = "CREATE TABLE puntos" + "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-												 "puntuacion INTEGER NOT NULL)";
-			stmt.executeUpdate(sql);
-			stmt.close();
-			conexion.close();
+			this.conexion = DriverManager.getConnection(URL);	
+			if (this.conexion != null) {
+			 System.out.println("Se ha conectado a la base de datos");
+			}
 			
 		} catch(SQLException e) {
-			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-			System.exit(0);
+			conexion = null;
+			System.out.println("Desconectado de la base de datos");
 		}
-		
-		System.out.println("Table created successfully");
-		
-		return conexion;		
+				
 	}
+	
+	public int consultaPuntos() throws SQLException {
+		
+			Statement stmt = this.conexion.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT puntuacion FROM puntos WHERE puntuacion = (SELECT MAX(puntuacion) FROM puntos)");
+			int puntos = 0;
+			while (rs.next()) {
+				int puntuacion = rs.getInt("puntuacion");
+				puntos = puntuacion;
+			}
+			rs.close();
+			stmt.close();
+			
 
+		return puntos;	
+	}
+	
+	public void agregaPuntos(int puntos) {
+		
+		PreparedStatement stmt = null;
+		try {
+			stmt = (PreparedStatement) conexion.prepareStatement("INSERT INTO puntos (puntuacion) VALUES ("+puntos+")");
+			stmt.execute();
+			stmt.close();
+		}catch (SQLException sqle) {
+			System.out.println("Error");
+		}
+	}
+	
+	public void apagarDb() {
+		if(conexion != null) {
+			conexion = null;
+			System.out.println("Se apagó la DB");
+	}
+	}
 }
